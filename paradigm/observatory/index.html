@@ -99,7 +99,7 @@
 <script>
 (function () {
   var esc = ParadigmCards.esc;
-  var WATCHED = ['Department for Education', 'Ofsted', 'GOV.UK Publications', 'Information Commissioner’s Office', 'Education Authority NI', 'CCEA', 'ETI', 'UK Parliament Education Committee'];
+  var WATCHED = ['Department for Education', 'Ofsted', 'Ofqual', 'GOV.UK Publications', 'Information Commissioner’s Office', 'Education Authority NI', 'CCEA', 'ETI', 'UK Parliament Education Committee'];
 
   document.getElementById('watch-panel').innerHTML = WATCHED.map(function (o) {
     return '<div class="row"><div class="name"><span class="live-dot"></span>' + esc(o) + '</div><span style="color:var(--ink-soft);font-size:11px;">Watching</span></div>';
@@ -127,7 +127,7 @@
     document.getElementById('stat-critical').textContent = regs.filter(function (r) { return r.impactLevel === 'Critical'; }).length;
     document.getElementById('stat-consult').textContent = regs.filter(function (r) { return r.status === 'Consultation' || r.status === 'Upcoming' || r.status === 'Delayed'; }).length;
 
-    var updateDates = regs.map(function (r) { return r.statusDate; }).filter(Boolean).sort();
+    var updateDates = regs.map(function (r) { return r.lastReviewed || r.statusDate; }).filter(Boolean).sort();
     var mostRecent = updateDates.length ? updateDates[updateDates.length - 1] : null;
     document.getElementById('last-checked').textContent = mostRecent ? ParadigmCards.formatDate(mostRecent) : 'Not yet recorded';
 
