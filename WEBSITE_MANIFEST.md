@@ -60,7 +60,7 @@ HTML files should NOT have hardcoded phone/email/pricing values — these are no
 | Key | Current Value | Pages |
 |---|---|---|
 | company_name | The Arena Hub Ltd | dpa |
-| company_number | 1708605 | company, dpa, privacy, compliance |
+| company_number | 17086105 | company, dpa, privacy, compliance |
 | duns_number | 234652645 | dpa, compliance |
 | director_name | Jonathan Baguley | dpa |
 | director_title | Founder & Principal Data Architect | dpa |

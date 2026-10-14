@@ -108,8 +108,8 @@ patch(BASE / 'company.html', [
 
     # Company number in footer
     (
-        'CH#1708605 &mdash; All rights reserved.',
-        'CH#<span data-config="company_number">1708605</span> &mdash; All rights reserved.'
+        'CH#17086105 &mdash; All rights reserved.',
+        'CH#<span data-config="company_number">17086105</span> &mdash; All rights reserved.'
     ),
 
     # LinkedIn footer link
@@ -159,14 +159,14 @@ patch(BASE / 'dpa.html', [
 
     # Company number in meta header
     (
-        'CH#1708605</p>',
-        'CH#<span data-config="company_number">1708605</span></p>'
+        'CH#17086105</p>',
+        'CH#<span data-config="company_number">17086105</span></p>'
     ),
 
     # Signatory block: Company No. + DUNS + Tel + Email (block replacement)
     (
-        'Company No. CH#1708605<br>\n                        D-U-N-S: 234652645<br>\n                        Tel: 01618702916<br>\n                        Email: <a href="mailto:compliance@thearenahub.co.uk">compliance@thearenahub.co.uk</a></p>',
-        'Company No. CH#<span data-config="company_number">1708605</span><br>\n                        D-U-N-S: <span data-config="duns_number">234652645</span><br>\n                        Tel: <a href="tel:01618702916" data-config="phone" data-config-href-prefix="tel:" data-config-href-key="phone">01618702916</a><br>\n                        Email: <a href="mailto:compliance@thearenahub.co.uk" data-config="email_compliance" data-config-href-prefix="mailto:" data-config-href-key="email_compliance">compliance@thearenahub.co.uk</a></p>'
+        'Company No. CH#17086105<br>\n                        D-U-N-S: 234652645<br>\n                        Tel: 01618702916<br>\n                        Email: <a href="mailto:compliance@thearenahub.co.uk">compliance@thearenahub.co.uk</a></p>',
+        'Company No. CH#<span data-config="company_number">17086105</span><br>\n                        D-U-N-S: <span data-config="duns_number">234652645</span><br>\n                        Tel: <a href="tel:01618702916" data-config="phone" data-config-href-prefix="tel:" data-config-href-key="phone">01618702916</a><br>\n                        Email: <a href="mailto:compliance@thearenahub.co.uk" data-config="email_compliance" data-config-href-prefix="mailto:" data-config-href-key="email_compliance">compliance@thearenahub.co.uk</a></p>'
     ),
 
     # Director signatory block
@@ -177,8 +177,8 @@ patch(BASE / 'dpa.html', [
 
     # Signatory block — company number line after director
     (
-        'The Arena Hub Ltd &nbsp;&bull;&nbsp; CH#1708605</p>\n                <p>Email: <a href="mailto:compliance@thearenahub.co.uk">compliance@thearenahub.co.uk</a></p>\n                <p>Tel: <a href="tel:01618702916">01618702916</a></p>',
-        '<span data-config="company_name">The Arena Hub Ltd</span> &nbsp;&bull;&nbsp; CH#<span data-config="company_number">1708605</span></p>\n                <p>Email: <a href="mailto:compliance@thearenahub.co.uk" data-config="email_compliance" data-config-href-prefix="mailto:" data-config-href-key="email_compliance">compliance@thearenahub.co.uk</a></p>\n                <p>Tel: <a href="tel:01618702916" data-config="phone" data-config-href-prefix="tel:" data-config-href-key="phone">01618702916</a></p>'
+        'The Arena Hub Ltd &nbsp;&bull;&nbsp; CH#17086105</p>\n                <p>Email: <a href="mailto:compliance@thearenahub.co.uk">compliance@thearenahub.co.uk</a></p>\n                <p>Tel: <a href="tel:01618702916">01618702916</a></p>',
+        '<span data-config="company_name">The Arena Hub Ltd</span> &nbsp;&bull;&nbsp; CH#<span data-config="company_number">17086105</span></p>\n                <p>Email: <a href="mailto:compliance@thearenahub.co.uk" data-config="email_compliance" data-config-href-prefix="mailto:" data-config-href-key="email_compliance">compliance@thearenahub.co.uk</a></p>\n                <p>Tel: <a href="tel:01618702916" data-config="phone" data-config-href-prefix="tel:" data-config-href-key="phone">01618702916</a></p>'
     ),
 
     # Footer compliance emails (two occurrences — same pattern, one in list)
@@ -193,8 +193,8 @@ patch(BASE / 'dpa.html', [
 
     # Company footer line
     (
-        'The Arena Hub Ltd &nbsp;&bull;&nbsp; CH#1708605 &nbsp;&bull;&nbsp; Registered in England &amp; Wales',
-        '<span data-config="company_name">The Arena Hub Ltd</span> &nbsp;&bull;&nbsp; CH#<span data-config="company_number">1708605</span> &nbsp;&bull;&nbsp; Registered in England &amp; Wales'
+        'The Arena Hub Ltd &nbsp;&bull;&nbsp; CH#17086105 &nbsp;&bull;&nbsp; Registered in England &amp; Wales',
+        '<span data-config="company_name">The Arena Hub Ltd</span> &nbsp;&bull;&nbsp; CH#<span data-config="company_number">17086105</span> &nbsp;&bull;&nbsp; Registered in England &amp; Wales'
     ),
 
     # Inline director mention in body (development mode paragraph)
@@ -211,14 +211,14 @@ patch(BASE / 'privacy.html', [
 
     # Meta header company number
     (
-        'CH#1708605</p>',
-        'CH#<span data-config="company_number">1708605</span></p>'
+        'CH#17086105</p>',
+        'CH#<span data-config="company_number">17086105</span></p>'
     ),
 
     # Intro paragraph company number
     (
-        'Company Number CH#1708605.',
-        'Company Number CH#<span data-config="company_number">1708605</span>.'
+        'Company Number CH#17086105.',
+        'Company Number CH#<span data-config="company_number">17086105</span>.'
     ),
 
     # All j.baguley email links (3 occurrences — same pattern)
@@ -259,8 +259,8 @@ patch(BASE / 'privacy.html', [
 
     # Footer copyright company number
     (
-        'CH#1708605 &mdash; All rights reserved.',
-        'CH#<span data-config="company_number">1708605</span> &mdash; All rights reserved.'
+        'CH#17086105 &mdash; All rights reserved.',
+        'CH#<span data-config="company_number">17086105</span> &mdash; All rights reserved.'
     ),
 ])
 
@@ -409,8 +409,8 @@ if p.exists():
 
     # Company number + DUNS in pricing footer/legal block
     content = content.replace(
-        'CH#1708605 &mdash; All rights reserved.',
-        'CH#<span data-config="company_number">1708605</span> &mdash; All rights reserved.'
+        'CH#17086105 &mdash; All rights reserved.',
+        'CH#<span data-config="company_number">17086105</span> &mdash; All rights reserved.'
     )
 
     if changed and not DRY_RUN:
@@ -431,8 +431,8 @@ patch(BASE / 'compliance.html', [
 
     # Company/DUNS in legal footer block
     (
-        'CH#1708605 &mdash; All rights reserved.',
-        'CH#<span data-config="company_number">1708605</span> &mdash; All rights reserved.'
+        'CH#17086105 &mdash; All rights reserved.',
+        'CH#<span data-config="company_number">17086105</span> &mdash; All rights reserved.'
     ),
 ])
 # Note: lines 378/470 are inside JS strings — patching those risks breaking JS.

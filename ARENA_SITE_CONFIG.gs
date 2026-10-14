@@ -1,7 +1,23 @@
 // ============================================================
-// ARENA SITE CONFIG v1.1.0
+// ARENA SITE CONFIG v1.2.0
 // GAS Web App — Dynamic site config for thearenahub.co.uk + arena-lite
 // Session: S104 — 2026-06-15
+//
+// v1.2.0 (S159 continued, 2026-08-16) — extended, not replaced. Two new
+// tabs added to the SAME sheet/deployment (PRICING, TESTIMONIALS) so
+// hestia.html/lite.html's pricing cards can be data-driven instead of
+// hand-duplicated PRICE_DISPLAY JS objects. Existing CONTACT/LEGAL/
+// PRICING(pilot)/SOCIAL config keys and doGet() shape are unchanged —
+// this is additive only. Full design: docs/planning/Future_Work/
+// ARENA_MARKETING_CMS_ARCHITECTURE_STUB.md.
+//
+// ONE-TIME ACTION AFTER PASTING THIS VERSION:
+//   Run addPricingTestimonialsTabs() once (Apps Script editor → select
+//   the function from the dropdown → Run). Idempotent — safe to re-run,
+//   will not duplicate tabs or reseed if they already exist. Then
+//   redeploy (Manage Deployments → edit → New Version → Deploy) so the
+//   live doGet() actually serves the new fields — saving the file alone
+//   does NOT update an already-published Web App version.
 //
 // SETUP (one-time):
 //   1. Create a new Google Apps Script project (script.google.com)
@@ -19,7 +35,7 @@
 //   Edit values → Commit — website updates immediately, no re-upload needed.
 // ============================================================
 
-const FOLDER_ID  = 'YOUR_FOLDER_ID_HERE'; // ← Get from Drive URL of 05_Websites folder
+const FOLDER_ID  = '1DVQXhtL9G4_Ne4tBXZ3fWEehHOpTlovg'; // 05_Websites Shared Drive folder
 const SHEET_NAME = 'ARENA_SITE_CONFIG';
 const TAB_NAME   = 'CONFIG';
 
@@ -29,7 +45,7 @@ const TAB_NAME   = 'CONFIG';
 // CATEGORY groups rows in the admin sidebar (CONTACT / LEGAL / PRICING / SOCIAL)
 const DEFAULTS = [
   ['KEY',                'VALUE',                                  'DESCRIPTION',                                                                        'CATEGORY'],
-  ['phone',              '01618702916',                            'Main business phone — UPDATE when new number issued. Appears on: company, dpa, privacy, terms', 'CONTACT'],
+  ['phone',              '',                                       'Main business phone — BLANK since 2026-07-24 (old number 01618702916 discontinued). Paste new number here (digits only, e.g. 01618700000) the moment it is purchased — every page pulls from this one cell. Appears on: company, dpa, privacy, terms (arena-hub-co-uk + arena-lite-com)', 'CONTACT'],
   ['email_dpo',          'j.baguley@thearenahub.co.uk',           'Director / DPO personal email — privacy, terms, dpa',                                'CONTACT'],
   ['email_pilot',        'pilot@thearenahub.co.uk',               'Pilot programme enquiries — pricing, company',                                       'CONTACT'],
   ['email_sales',        'sales@thearenahub.co.uk',               'Sales enquiries — pricing, company',                                                 'CONTACT'],
@@ -43,7 +59,7 @@ const DEFAULTS = [
   ['email_legal',        'legal@thearenahub.co.uk',              'Legal enquiries — arena-lite terms.html (multi-seat, cancellation)',                   'CONTACT'],
   ['email_hello',        'hello@thearenahub.co.uk',              'General hello address — arena-lite signup.html',                                        'CONTACT'],
   ['company_name',       'The Arena Hub Ltd',                     'Full registered company name',                                                       'LEGAL'],
-  ['company_number',     '1708605',                               'Companies House number — displayed as CH#1708605 on site',                           'LEGAL'],
+  ['company_number',     '17086105',                               'Companies House number — displayed as CH#17086105 on site',                           'LEGAL'],
   ['duns_number',        '234652645',                             'D-U-N-S number — compliance, dpa pages',                                             'LEGAL'],
   ['director_name',      'Jonathan Baguley',                      'Director full name — DPA signatory block',                                           'LEGAL'],
   ['director_title',     'Founder & Principal Data Architect',    'Director title — DPA signatory block',                                               'LEGAL'],
@@ -56,15 +72,59 @@ const DEFAULTS = [
   ['social_substack',    'https://thearenahub.substack.com',     'Substack publication URL',                                                           'SOCIAL'],
 ];
 
+// ─── PRICING / TESTIMONIALS TABS (v1.2.0) ──────────────────────────────────────
+// Row-per-record shape, distinct from the KEY/VALUE CONFIG tab above — mirrors
+// PARADIGM_CONTENT's tab-per-content-type pattern. See ARENA_MARKETING_CMS_
+// ARCHITECTURE_STUB.md Section 3 for the full schema rationale.
+
+const PRICING_TAB      = 'PRICING';
+const TESTIMONIALS_TAB = 'TESTIMONIALS';
+
+const PRICING_HEADERS = [
+  'PLAN_ID', 'PRODUCT', 'PLAN_NAME',
+  'MONTHLY_AMOUNT', 'MONTHLY_UNIT', 'MONTHLY_NOTE', 'MONTHLY_BTN_TEXT',
+  'ANNUAL_AMOUNT', 'ANNUAL_UNIT', 'ANNUAL_NOTE', 'ANNUAL_BTN_TEXT',
+  'SAVE_BADGE_TEXT', 'FEATURES', 'ACTIVE', 'LAST_UPDATED'
+];
+
+// Seeded with today's real, live figures — transcribed from hestia.html/
+// lite.html's own hardcoded PRICE_DISPLAY objects at the point this was
+// built, so this seed is a migration, not new pricing. FEATURES is
+// pipe-separated (mirrors PARADIGM_CONTENT's comma-separated TAGS
+// convention, pipe chosen here since feature text itself may contain commas).
+const PRICING_SEED = [
+  ['hestia_standard', 'hestia', 'Hestia',
+   '£14.99', '/month', 'Billed monthly · cancel any time', 'Subscribe — £14.99/mo',
+   '£134.99', '/year', 'Billed annually · ~25% cheaper than monthly', 'Subscribe — £134.99/yr',
+   'Save ~25%',
+   'AI-guided daily planning|Evidence capture built for home|Routine and mood tracking|Dedicated safeguarding record|Your own Google account — nothing shared without consent',
+   true, ''],
+  ['lite_standard', 'lite', 'Arena Lite',
+   '£19.99', '/month', 'Billed monthly · cancel any time', 'Subscribe — £19.99/mo',
+   '£180', '/year', 'Billed annually · ~25% cheaper than monthly', 'Subscribe — £180/yr',
+   'Save ~25%',
+   'Unlimited evidence captures|AI-assisted qualification matching|Sovereign storage — your own Google Drive|SECO safeguarding exports, under your control|No setup fee, no IT involvement required',
+   true, ''],
+];
+
+const TESTIMONIALS_HEADERS = [
+  'TESTIMONIAL_ID', 'PRODUCT', 'QUOTE', 'ATTRIBUTION', 'ROLE_OR_CONTEXT',
+  'DATE_ADDED', 'FEATURED', 'ACTIVE', 'SORT_ORDER'
+];
+// Deliberately no seed rows — ships empty. Jon is waiting on real customer
+// testimonials, not seeding placeholders (confirmed 2026-08-16). The
+// marketing-data-loader.js client hides the testimonials section entirely
+// when this tab has zero ACTIVE rows — add real rows here whenever ready,
+// no code change needed on either end.
+
 
 // ─── SETUP (run once) ─────────────────────────────────────────────────────────
 function setupSheet() {
-  const ui = SpreadsheetApp.getUi();
   let folder;
   try {
     folder = DriveApp.getFolderById(FOLDER_ID);
   } catch (e) {
-    ui.alert('❌ Folder not found. Check FOLDER_ID at the top of the script.\n\nError: ' + e.message);
+    console.log('❌ Folder not found. Check FOLDER_ID. Error: ' + e.message);
     return;
   }
 
@@ -73,7 +133,7 @@ function setupSheet() {
   if (existing.hasNext()) {
     const existingId = existing.next().getId();
     PropertiesService.getScriptProperties().setProperty('CONFIG_SHEET_ID', existingId);
-    ui.alert('⚠️ Sheet already exists. Stored ID: ' + existingId + '\n\nNo changes made.');
+    console.log('⚠️ Sheet already exists. Stored ID: ' + existingId + ' — No changes made.');
     return;
   }
 
@@ -108,13 +168,51 @@ function setupSheet() {
   // Store sheet ID for fast access
   PropertiesService.getScriptProperties().setProperty('CONFIG_SHEET_ID', ss.getId());
 
-  ui.alert(
-    '✅ ARENA_SITE_CONFIG created successfully!\n\n' +
-    'Sheet ID: ' + ss.getId() + '\n' +
-    'Location: ' + folder.getName() + '\n\n' +
-    'Next step: Deploy this script as a Web App and paste the /exec URL into arena-config.js'
-  );
-  Logger.log('Sheet ID: ' + ss.getId());
+  console.log('✅ ARENA_SITE_CONFIG created. Sheet ID: ' + ss.getId() + ' — Location: ' + folder.getName());
+}
+
+
+// ─── PRICING / TESTIMONIALS SETUP (run once) ───────────────────────────────────
+/**
+ * addPricingTestimonialsTabs() — v1.2.0 one-time setup, run manually from the
+ * Apps Script editor after pasting this version. Idempotent: if a tab already
+ * exists, it is left completely untouched (no reseed, no overwrite) — safe to
+ * re-run if unsure whether it's already been done.
+ */
+function addPricingTestimonialsTabs() {
+  const configSheet = _getSheet();
+  const ss = configSheet.getParent();
+  const now = Utilities.formatDate(new Date(), 'Europe/London', 'yyyy-MM-dd HH:mm');
+
+  let pricingSheet = ss.getSheetByName(PRICING_TAB);
+  if (!pricingSheet) {
+    pricingSheet = ss.insertSheet(PRICING_TAB);
+    pricingSheet.getRange(1, 1, 1, PRICING_HEADERS.length).setValues([PRICING_HEADERS]);
+    pricingSheet.getRange(1, 1, 1, PRICING_HEADERS.length).setBackground('#1a2332').setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(11);
+    const seeded = PRICING_SEED.map(function (row) {
+      const r = row.slice();
+      r[r.length - 1] = now; // LAST_UPDATED
+      return r;
+    });
+    pricingSheet.getRange(2, 1, seeded.length, PRICING_HEADERS.length).setValues(seeded);
+    pricingSheet.setFrozenRows(1);
+    pricingSheet.autoResizeColumns(1, PRICING_HEADERS.length);
+    console.log('✅ PRICING tab created and seeded with ' + seeded.length + ' plan(s).');
+  } else {
+    console.log('⚠️ PRICING tab already exists — no changes made.');
+  }
+
+  let testimonialsSheet = ss.getSheetByName(TESTIMONIALS_TAB);
+  if (!testimonialsSheet) {
+    testimonialsSheet = ss.insertSheet(TESTIMONIALS_TAB);
+    testimonialsSheet.getRange(1, 1, 1, TESTIMONIALS_HEADERS.length).setValues([TESTIMONIALS_HEADERS]);
+    testimonialsSheet.getRange(1, 1, 1, TESTIMONIALS_HEADERS.length).setBackground('#1a2332').setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(11);
+    testimonialsSheet.setFrozenRows(1);
+    testimonialsSheet.autoResizeColumns(1, TESTIMONIALS_HEADERS.length);
+    console.log('✅ TESTIMONIALS tab created, empty by design — add rows whenever real testimonials are ready. ACTIVE column: TRUE/FALSE checkbox or boolean, not a text placeholder.');
+  } else {
+    console.log('⚠️ TESTIMONIALS tab already exists — no changes made.');
+  }
 }
 
 
@@ -131,8 +229,12 @@ function doGet(e) {
       if (key) config[key] = val;
     }
 
+    const ss          = sheet.getParent();
+    const pricing      = _readTabAsObjects(ss, PRICING_TAB);
+    const testimonials = _readTabAsObjects(ss, TESTIMONIALS_TAB);
+
     return ContentService
-      .createTextOutput(JSON.stringify({ ok: true, config }))
+      .createTextOutput(JSON.stringify({ ok: true, config, pricing, testimonials }))
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
@@ -142,12 +244,38 @@ function doGet(e) {
   }
 }
 
+/**
+ * Reads a tab into an array of row objects keyed by its own header row.
+ * Returns [] if the tab doesn't exist yet — so doGet() never breaks if
+ * addPricingTestimonialsTabs() hasn't been run yet; new tabs are additive,
+ * never required for the endpoint to keep serving existing config values.
+ */
+function _readTabAsObjects(ss, tabName) {
+  const sheet = ss.getSheetByName(tabName);
+  if (!sheet) return [];
+  const data = sheet.getDataRange().getValues();
+  if (data.length < 2) return [];
+  const headers = data[0].map(function (h) { return String(h).trim(); });
+  const rows = [];
+  for (let i = 1; i < data.length; i++) {
+    if (!String(data[i][0]).trim()) continue; // skip blank rows
+    const row = {};
+    for (let c = 0; c < headers.length; c++) {
+      if (headers[c]) row[headers[c]] = data[i][c];
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
 
 // ─── ON OPEN MENU ─────────────────────────────────────────────────────────────
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('⚡ Arena Config')
     .addItem('Open Admin Panel', 'showAdminSidebar')
+    .addSeparator()
+    .addItem('Add Pricing/Testimonials tabs (one-time, v1.2.0)', 'addPricingTestimonialsTabs')
     .addSeparator()
     .addItem('Re-run Setup (if sheet moved)', 'relink')
     .addToUi();
